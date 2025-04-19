@@ -1,10 +1,8 @@
 name: Run Tests
-
 on:
   push:
     branches:
       - main
-
 jobs:
   run-test:
     runs-on: ubuntu-latest
@@ -31,14 +29,12 @@ jobs:
           echo "content<<EOF" >> $GITHUB_OUTPUT
           cat ctrf/ctrf-report.json >> $GITHUB_OUTPUT
           echo "EOF" >> $GITHUB_OUTPUT
-  
   autograder:
     needs: run-test
     runs-on: ubuntu-latest # You need to specify a runner
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-
       - name: Run autograder
         uses: brunchlabs/autograder@main
         with:
