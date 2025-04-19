@@ -31,6 +31,7 @@ jobs:
           echo "content<<EOF" >> $GITHUB_OUTPUT
           cat ctrf/ctrf-report.json >> $GITHUB_OUTPUT
           echo "EOF" >> $GITHUB_OUTPUT
+  
   autograder:
     needs: run-test
     runs-on: ubuntu-latest # You need to specify a runner
