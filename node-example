@@ -1,0 +1,50 @@
+name: Run Tests
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  run-test:
+    runs-on: ubuntu-latest
+    outputs:
+      report: ${{ steps.read_file.outputs.content }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run Jest tests
+        run: npx jest ${{ github.ref_name }}.test.js
+
+      - name: Read CTRF report
+        id: read_file
+        run: |
+          echo "content<<EOF" >> $GITHUB_OUTPUT
+          cat ctrf/ctrf-report.json >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+  autograder:
+    needs: run-test
+    runs-on: ubuntu-latest # You need to specify a runner
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Run autograder
+        uses: brunchlabs/autograder@main
+        with:
+          repo: ${{ github.repository }}
+          student: ${{ github.actor }}
+          studentId: ${{ github.actor_id }}
+          organization: ${{ github.repository_owner }}
+          organizationId: ${{ github.repository_owner_id	}}
+          report: ${{ needs.test.outputs.report }}
+          branch: ${{ github.ref_name }}
